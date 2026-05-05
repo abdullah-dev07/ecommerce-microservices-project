@@ -1,31 +1,23 @@
-import enum
-from datetime import datetime, timezone
+from enum import Enum
 
-from sqlalchemy import JSON, Column, DateTime, Enum as SQLEnum, Float, Integer
-
-from app.db.base import Base
+from tortoise import fields, models
 
 
-class OrderStatus(str, enum.Enum):
+class OrderStatus(str, Enum):
     PENDING = "pending"
     CONFIRMED = "confirmed"
     CANCELLED = "cancelled"
 
 
-class Order(Base):
-    __tablename__ = "orders"
+class Order(models.Model):
+    id = fields.IntField(pk=True)
+    user_id = fields.IntField(index=True)
+    # Snapshot of line items at order time:
+    # [{product_id, name, quantity, unit_price, line_total}, ...]
+    items = fields.JSONField()
+    total = fields.FloatField()
+    status = fields.CharEnumField(OrderStatus, default=OrderStatus.PENDING, max_length=20)
+    created_at = fields.DatetimeField(auto_now_add=True)
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, nullable=False, index=True)
-    items = Column(JSON, nullable=False)  # snapshot: [{product_id, name, quantity, unit_price, line_total}]
-    total = Column(Float, nullable=False)
-    status = Column(
-        SQLEnum(OrderStatus, name="order_status"),
-        default=OrderStatus.PENDING,
-        nullable=False,
-    )
-    created_at = Column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        nullable=False,
-    )
+    class Meta:
+        table = "orders"

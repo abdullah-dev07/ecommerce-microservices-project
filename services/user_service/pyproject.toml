@@ -1,0 +1,8 @@
+[tool.aerich]
+# Path to the TORTOISE_ORM config dict — Aerich imports this to discover models.
+tortoise_orm = "app.core.tortoise.TORTOISE_ORM"
+# Where migration files are stored. Aerich creates a subfolder per Tortoise app
+# (e.g. ./migrations/models/).
+location = "./migrations"
+# Project source root (used by Aerich to resolve imports).
+src_folder = "./."

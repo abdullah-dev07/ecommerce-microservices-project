@@ -1,10 +1,9 @@
-"""Order business logic. No FastAPI imports beyond HTTPException for errors."""
+"""Order business logic. Inter-service calls live in `app/clients/`."""
 from __future__ import annotations
 
 import logging
 
 from fastapi import HTTPException, status
-from sqlalchemy.orm import Session
 
 from app.clients import product_client, user_client
 from app.models.order import Order, OrderStatus
@@ -13,19 +12,19 @@ from app.schemas.order import OrderCreate
 logger = logging.getLogger(__name__)
 
 
-async def create_order(db: Session, payload: OrderCreate) -> Order:
+async def create_order(payload: OrderCreate) -> Order:
     """
     Create an order across User + Product services.
 
     Steps:
       1. Verify the user exists.
       2. For each item: fetch product details and check stock.
-      3. Deduct stock for each item, tracking what we deducted so we can
-         compensate (restore) on later failure.
-      4. Persist the order. If persistence fails, restore all deducted stock.
+      3. Deduct stock per item, tracking what we deducted so we can compensate
+         (restore) on later failure.
+      4. Persist the order locally. If persistence fails, restore deducted stock.
 
-    NOTE: This is a simplified Saga. For production, prefer an event-driven
-    flow with an outbox table so the local DB write and the events are atomic.
+    NOTE: Simplified Saga. For production prefer an event-driven flow with an
+    outbox table so the local DB write and the events are atomic.
     """
     await user_client.verify_user(payload.user_id)
 
@@ -56,16 +55,12 @@ async def create_order(db: Session, payload: OrderCreate) -> Order:
             await product_client.adjust_stock(item.product_id, -item.quantity)
             deducted.append((item.product_id, item.quantity))
 
-        order = Order(
+        return await Order.create(
             user_id=payload.user_id,
             items=line_items,
             total=round(total, 2),
             status=OrderStatus.CONFIRMED,
         )
-        db.add(order)
-        db.commit()
-        db.refresh(order)
-        return order
     except Exception:
         await _restore_stock(deducted)
         raise
@@ -84,8 +79,8 @@ async def _restore_stock(deducted: list[tuple[int, int]]) -> None:
             )
 
 
-def get_order(db: Session, order_id: int) -> Order:
-    order = db.query(Order).filter(Order.id == order_id).first()
+async def get_order(order_id: int) -> Order:
+    order = await Order.get_or_none(id=order_id)
     if not order:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -94,12 +89,12 @@ def get_order(db: Session, order_id: int) -> Order:
     return order
 
 
-def list_user_orders(db: Session, user_id: int) -> list[Order]:
-    return db.query(Order).filter(Order.user_id == user_id).all()
+async def list_user_orders(user_id: int) -> list[Order]:
+    return await Order.filter(user_id=user_id).all()
 
 
-async def cancel_order(db: Session, order_id: int) -> Order:
-    order = get_order(db, order_id)
+async def cancel_order(order_id: int) -> Order:
+    order = await get_order(order_id)
     if order.status == OrderStatus.CANCELLED:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -117,6 +112,5 @@ async def cancel_order(db: Session, order_id: int) -> Order:
             )
 
     order.status = OrderStatus.CANCELLED
-    db.commit()
-    db.refresh(order)
+    await order.save()
     return order

@@ -1,19 +1,12 @@
-from datetime import datetime, timezone
-
-from sqlalchemy import Column, DateTime, Integer, String
-
-from app.db.base import Base
+from tortoise import fields, models
 
 
-class User(Base):
-    __tablename__ = "users"
+class User(models.Model):
+    id = fields.IntField(pk=True)
+    name = fields.CharField(max_length=100)
+    email = fields.CharField(max_length=255, unique=True, index=True)
+    password_hash = fields.CharField(max_length=255)
+    created_at = fields.DatetimeField(auto_now_add=True)
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    email = Column(String, unique=True, index=True, nullable=False)
-    password_hash = Column(String, nullable=False)
-    created_at = Column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        nullable=False,
-    )
+    class Meta:
+        table = "users"

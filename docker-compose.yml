@@ -51,7 +51,7 @@ services:
   user_service:
     build: ./services/user_service
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@user_db:5432/user_db
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@user_db:5432/user_db
     expose:
       - "8001"
     depends_on:
@@ -62,7 +62,7 @@ services:
   product_service:
     build: ./services/product_service
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@product_db:5432/product_db
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@product_db:5432/product_db
     expose:
       - "8002"
     depends_on:
@@ -73,7 +73,7 @@ services:
   order_service:
     build: ./services/order_service
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@order_db:5432/order_db
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@order_db:5432/order_db
       USER_SERVICE_URL: http://user_service:8001
       PRODUCT_SERVICE_URL: http://product_service:8002
     expose:

@@ -62,3 +62,7 @@ logs/
 *.sqlite3
 *.db
 postgres-data/
+
+# ─── Aerich (migrations) ──────────────────────────────────────
+# Migration files in services/*/migrations/models/*.py are SOURCE —
+# always commit them. Bytecode caches are already covered by __pycache__/.

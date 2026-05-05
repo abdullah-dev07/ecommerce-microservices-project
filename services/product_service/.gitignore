@@ -11,4 +11,5 @@ __pycache__/
 .env.local
 !.env.example
 
-alembic/__pycache__/
+migrations/__pycache__/
+migrations/models/__pycache__/

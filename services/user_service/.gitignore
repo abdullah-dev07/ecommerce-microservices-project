@@ -14,5 +14,6 @@ __pycache__/
 .env.local
 !.env.example
 
-# Alembic local cache (when migrations are added later)
-alembic/__pycache__/
+# Aerich migration bytecode (the .py files themselves are committed)
+migrations/__pycache__/
+migrations/models/__pycache__/
