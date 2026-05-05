@@ -93,6 +93,7 @@ services:
       USER_SERVICE_URL: http://user_service:8001
       PRODUCT_SERVICE_URL: http://product_service:8002
       ORDER_SERVICE_URL: http://order_service:8003
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
     ports:
       - "8000:8000"
     depends_on:
