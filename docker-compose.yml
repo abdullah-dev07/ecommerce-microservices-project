@@ -1,0 +1,107 @@
+services:
+
+  # ─── Databases ───────────────────────────────────────────────
+  user_db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    ports:
+      - "5433:5432"
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      retries: 5
+
+  product_db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: product_db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    ports:
+      - "5434:5432"
+    volumes:
+      - product_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      retries: 5
+
+  order_db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: order_db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    ports:
+      - "5435:5432"
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      retries: 5
+
+  # ─── Microservices ────────────────────────────────────────────
+  # Internal services do NOT publish ports — only the API Gateway is exposed.
+  user_service:
+    build: ./services/user_service
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@user_db:5432/user_db
+    expose:
+      - "8001"
+    depends_on:
+      user_db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  product_service:
+    build: ./services/product_service
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@product_db:5432/product_db
+    expose:
+      - "8002"
+    depends_on:
+      product_db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  order_service:
+    build: ./services/order_service
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@order_db:5432/order_db
+      USER_SERVICE_URL: http://user_service:8001
+      PRODUCT_SERVICE_URL: http://product_service:8002
+    expose:
+      - "8003"
+    depends_on:
+      order_db:
+        condition: service_healthy
+      user_service:
+        condition: service_started
+      product_service:
+        condition: service_started
+    restart: unless-stopped
+
+  api_gateway:
+    build: ./services/api_gateway
+    environment:
+      USER_SERVICE_URL: http://user_service:8001
+      PRODUCT_SERVICE_URL: http://product_service:8002
+      ORDER_SERVICE_URL: http://order_service:8003
+    ports:
+      - "8000:8000"
+    depends_on:
+      - user_service
+      - product_service
+      - order_service
+    restart: unless-stopped
+
+volumes:
+  user_db_data:
+  product_db_data:
+  order_db_data:

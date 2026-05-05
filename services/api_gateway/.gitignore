@@ -1,0 +1,12 @@
+# Most rules live in the repo-root .gitignore.
+# This file covers things that may appear when running this service in isolation.
+
+.venv/
+venv/
+
+__pycache__/
+*.pyc
+
+.env
+.env.local
+!.env.example

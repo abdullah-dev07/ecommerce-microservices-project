@@ -1,0 +1,64 @@
+# ─── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# Testing / coverage / type checkers
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+
+# ─── Environment & secrets ────────────────────────────────────
+# Ignore real env files but keep the example template.
+.env
+.env.*
+!.env.example
+
+# ─── Docker ───────────────────────────────────────────────────
+# Dockerfile and docker-compose.yml are source — DO commit them.
+# Only local-only override files are ignored:
+docker-compose.override.yml
+docker-compose.override.yaml
+docker-compose.*.local.yml
+
+# ─── Editors / IDEs ───────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ─── OS ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Logs ─────────────────────────────────────────────────────
+*.log
+logs/
+
+# ─── Database dumps / local data ──────────────────────────────
+*.sqlite
+*.sqlite3
+*.db
+postgres-data/

@@ -1,0 +1,18 @@
+# Most rules live in the repo-root .gitignore.
+# This file covers things that may appear when running this service in isolation.
+
+# Local virtual env
+.venv/
+venv/
+
+# Bytecode
+__pycache__/
+*.pyc
+
+# Per-service env overrides (only the example is committed)
+.env
+.env.local
+!.env.example
+
+# Alembic local cache (when migrations are added later)
+alembic/__pycache__/
