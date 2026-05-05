@@ -64,5 +64,24 @@ logs/
 postgres-data/
 
 # ─── Aerich (migrations) ──────────────────────────────────────
-# Migration files in services/*/migrations/models/*.py are SOURCE —
+# Migration files in backend/services/*/migrations/models/*.py are SOURCE —
 # always commit them. Bytecode caches are already covered by __pycache__/.
+
+# ─── Node / Next.js (frontend) ────────────────────────────────
+node_modules/
+.npm/
+.pnpm-store/
+.yarn/
+
+# Next.js build artifacts
+.next/
+out/
+next-env.d.ts
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing (frontend)
+coverage/
+.eslintcache
+

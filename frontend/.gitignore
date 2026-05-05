@@ -1,0 +1,22 @@
+# Most rules live in the repo-root .gitignore.
+
+# Dependencies
+node_modules/
+.pnp.*
+
+# Build artifacts
+.next/
+out/
+build/
+next-env.d.ts
+
+# Local env
+.env
+.env.local
+.env.*.local
+!.env.local.example
+
+# Logs / caches
+*.log
+.eslintcache
+*.tsbuildinfo
