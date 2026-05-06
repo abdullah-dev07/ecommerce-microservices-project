@@ -9,3 +9,12 @@ export function formatDate(value: string | Date): string {
   const d = typeof value === "string" ? new Date(value) : value;
   return d.toLocaleString();
 }
+
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+});
+
+export function formatCurrency(value: number): string {
+  return currencyFormatter.format(value);
+}

@@ -12,8 +12,8 @@ const SECTIONS = [
   {
     href: "/products",
     title: "Products",
-    description: "Manage product catalog and stock. (coming next)",
-    available: false,
+    description: "Manage the product catalog and view stock.",
+    available: true,
   },
   {
     href: "/orders",
