@@ -18,8 +18,8 @@ const SECTIONS = [
   {
     href: "/orders",
     title: "Orders",
-    description: "Place and inspect orders. (coming next)",
-    available: false,
+    description: "Place orders, view and cancel them per customer.",
+    available: true,
   },
 ];
 
